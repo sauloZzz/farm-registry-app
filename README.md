@@ -1,142 +1,92 @@
-# 🌾 Farm Registry App
+# 🏡 FincasDpts – Agricultural Property Management System
 
-A Spring Boot web application for managing rural farms and their geographic locations (departments and municipalities).  
-This project demonstrates clean architecture using **Spring MVC**, **JPA/Hibernate**, **Thymeleaf**, and **MySQL**, following clean design practices and separation of concerns.
-
----
-
-## 📌 Features
-
-### ✅ Farm Management (CRUD)
-- Register new farms with:
-  - Owner name  
-  - Phone number  
-  - Address  
-  - Department  
-  - Municipality  
-- List all registered farms  
-- Delete farms with confirmation messages  
-
-### ✅ Dynamic Geographic Loading
-- Municipalities automatically load based on the selected department  
-- AJAX-based dynamic loading using `fetch()`  
-- No page reloads required  
-
-### ✅ Validation & Error Handling
-- Server-side validation  
-- Success and error alerts  
-- Foreign key validation for department and municipality  
-
-### ✅ Database Included
-- MySQL schema included: `farm_registry.sql`  
-- Contains:
-  - Colombian departments  
-  - Municipalities for each department  
-
-### ✅ User-Friendly UI
-- Built with **Bootstrap 5**  
-- Responsive layout for desktop and mobile  
-- Clean visual design  
+FincasDpts is a web-based management system designed for registering, editing, searching, and organizing agricultural properties (fincas) across different departments and municipalities.  
+The application is built using **Spring Boot, Thymeleaf, JPA/Hibernate, and MySQL** following a clean MVC architecture.
 
 ---
 
-## 🧱 Architecture (Design Logic)
+## 🚀 Features
 
-The project follows a traditional **Spring MVC layered architecture**:
+### ✅ Property (Finca) Management
+- Create new properties  
+- Edit existing properties  
+- Delete properties  
+- View detailed information  
+- Validate data before saving  
 
-Controller → Service → Repository → Entity → Database
-Front-End (Thymeleaf + Bootstrap + JS)
+### 🌎 Geographic Structure
+- Each property is associated with:
+  - A **Department**
+  - A **Municipality** (filtered by department)
 
+### 💾 Database Integration
+- Fully connected to **MySQL**
+- Uses **JPA relationships**:
+  - `Departamento` → `Municipio` (One-to-Many)
+  - `Municipio` → `Finca` (One-to-Many)
+- Automatic schema handling with Hibernate
 
-### 🔹 Controller Layer
-Handles routing, form submissions, and REST endpoints.
+### 🎨 Modern UI
+- Thymeleaf templates
+- Bootstrap styles (optional)
+- Clean interface for CRUD operations
 
-Example: dynamic municipality loading:
+---
 
-```java
-@GetMapping("/municipios/{idDepartamento}")
-@ResponseBody
-public List<Municipio> obtenerMunicipiosPorDepartamento(@PathVariable Long idDepartamento) {
-    return municipioRepository.findByDepartamento_Id(idDepartamento);
-}
+## 🧱 Technologies Used
 
+| Layer | Technology |
+|-------|------------|
+| Backend | Spring Boot 3, Java 17 |
+| Frontend | Thymeleaf, HTML5, Bootstrap |
+| Database | MySQL 8, JPA/Hibernate |
+| Build tool | Maven |
+| Version control | Git & GitHub |
 
-🔹 Service Layer
+---
 
-Contains business logic and validation.
+## 📦 Project Structure
 
-🔹 Repository Layer
-
-Uses Spring Data JPA to interact with the database.
-
-🔹 View Layer
-
-Uses Thymeleaf + Bootstrap for a clean and responsive UI.
-
-🛠️ Technologies Used
-
-Java 17
-
-Spring Boot 3
-
-Spring MVC
-
-Spring Data JPA
-
-Thymeleaf
-
-MySQL 8
-
-
-src/main/java/com/farmregistry
-│
-├── controller/      → MVC controllers
-├── entity/          → JPA entities
-├── repository/      → Spring Data JPA interfaces
-├── service/         → Business logic
-└── FarmRegistryApp  → Main application
-
-
-src/main/resources
-│
-├── templates/       → Thymeleaf HTML views
-├── static/          → CSS, JS
+src/
+├── main/java/edu/unisangil/fincasdpts/
+│ ├── controller/ # Controllers for handling HTTP requests
+│ ├── entity/ # JPA entities (Finca, Municipio, Departamento)
+│ ├── repository/ # Spring Data repositories
+│ ├── service/ # Optional service layer
+│ └── FinacsDptsApp # Main Spring Boot class
+└── main/resources/
+├── templates/ # Thymeleaf HTML files
+├── static/ # CSS / JS / images
 └── application.properties
 
 
-🚀 How to Run the Project
-1️⃣ Clone the repository
-git clone https://github.com/sauloZzz/farm-registry-app.git
-cd farm-registry-app
+---
 
-2️⃣ Create the MySQL database
-CREATE DATABASE farm_registry;
+## ⚙️ Installation & Setup
 
-3️⃣ Import the SQL file
+### 1️⃣ Clone the repository
+```bash
+git clone https://github.com/your-username/fincasdpts.git
+cd fincasdpts
 
-Use phpMyAdmin, MySQL Workbench or terminal:
 
-mysql -u root -p farm_registry < farm_registry.sql
+2️⃣ Configure the database
 
-4️⃣ Configure MySQL credentials
+Create a MySQL database:
+CREATE DATABASE fincas_dpts CHARACTER SET utf8mb4;
 
-Edit the file:
+Update application.properties:
+spring.datasource.url=jdbc:mysql://localhost:3306/fincas_dpts
+spring.datasource.username=your_user
+spring.datasource.password=your_password
 
-src/main/resources/application.properties
-
-spring.datasource.url=jdbc:mysql://localhost:3306/farm_registry
-spring.datasource.username=root
-spring.datasource.password=YOUR_PASSWORD
-spring.jpa.hibernate.ddl-auto=none
+spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
 
-5️⃣ Run the app
+3️⃣ Run the application
 mvn spring-boot:run
 
-6️⃣ Open in browser
-http://localhost:8080
-Hibernate
 
-Bootstrap 5
+Then open in your browser:
 
-Fetch API (JavaScript)
+http://localhost:8080/fincas
