@@ -27,55 +27,85 @@ public class FincaController {
         this.municipioRepository = municipioRepository;
     }
 
-    // Pantalla principal
-    @GetMapping({"/fincas"})
+    // LISTAR + FORMULARIO PRINCIPAL
+    @GetMapping("/fincas")
     public String mostrarFincas(Model model) {
-
         model.addAttribute("fincas", fincaRepository.findAll());
         model.addAttribute("departamentos", departamentoRepository.findAll());
         model.addAttribute("finca", new Finca());
-
-        return "fincas"; // fincas.html
+        return "fincas";
     }
 
-    // Guardar finca
+    // GUARDAR
     @PostMapping("/fincas/guardar")
     public String guardarFinca(
             @ModelAttribute Finca finca,
             @RequestParam("departamentoId") Long departamentoId,
-            @RequestParam("municipioId") Long municipioId,
-            Model model
+            @RequestParam("municipioId") Long municipioId
     ) {
-        try {
-            Departamento dpto = departamentoRepository.findById(departamentoId)
-                    .orElseThrow(() -> new IllegalArgumentException("Departamento no encontrado"));
 
-            Municipio muni = municipioRepository.findById(municipioId)
-                    .orElseThrow(() -> new IllegalArgumentException("Municipio no encontrado"));
+        Departamento dpto = departamentoRepository.findById(departamentoId)
+                .orElseThrow(() -> new IllegalArgumentException("Departamento no encontrado"));
 
-            finca.setDepartamento(dpto);
-            finca.setMunicipio(muni);
+        Municipio muni = municipioRepository.findById(municipioId)
+                .orElseThrow(() -> new IllegalArgumentException("Municipio no encontrado"));
 
-            fincaRepository.save(finca);
+        finca.setDepartamento(dpto);
+        finca.setMunicipio(muni);
 
-            model.addAttribute("exito", "Finca registrada correctamente");
+        fincaRepository.save(finca);
+        return "redirect:/fincas";
+    }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            model.addAttribute("error", "Error al guardar la finca: " + e.getMessage());
-        }
+    // CARGAR FORMULARIO PARA EDITAR
+    @GetMapping("/fincas/editar/{id}")
+    public String editarFinca(@PathVariable Long id, Model model) {
+
+        Finca finca = fincaRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Finca no encontrada"));
+
+        List<Departamento> departamentos = departamentoRepository.findAll();
+        List<Finca> fincas = fincaRepository.findAll();
+
+        model.addAttribute("finca", finca);
+        model.addAttribute("departamentos", departamentos);
+        model.addAttribute("fincas", fincas);
+
+
+        return "fincas";
+    }
+
+
+    // ACTUALIZAR
+    @PostMapping("/fincas/actualizar")
+    public String actualizarFinca(
+            @ModelAttribute Finca finca,
+            @RequestParam("departamentoId") Long departamentoId,
+            @RequestParam("municipioId") Long municipioId
+    ) {
+
+        Departamento dpto = departamentoRepository.findById(departamentoId)
+                .orElseThrow(() -> new IllegalArgumentException("Departamento no encontrado"));
+
+        Municipio muni = municipioRepository.findById(municipioId)
+                .orElseThrow(() -> new IllegalArgumentException("Municipio no encontrado"));
+
+        finca.setDepartamento(dpto);
+        finca.setMunicipio(muni);
+
+        fincaRepository.save(finca);
 
         return "redirect:/fincas";
     }
 
-    // Eliminar finca por ID
+    // ELIMINAR
     @GetMapping("/fincas/eliminar/{id}")
-    public String eliminarFinca(@PathVariable Long id) {
+    public String eliminar(@PathVariable Long id) {
         fincaRepository.deleteById(id);
         return "redirect:/fincas";
     }
 
-    // Municipios por departamento
+    // MUNICIPIOS POR DEPARTAMENTO
     @GetMapping("/municipios/{idDepartamento}")
     @ResponseBody
     public List<Municipio> obtenerMunicipiosPorDepartamento(@PathVariable Long idDepartamento) {

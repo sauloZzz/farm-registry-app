@@ -6,67 +6,94 @@
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
 </head>
+
 <body class="bg-light">
 
 <div class="container mt-4">
+
     <h1 class="mb-4">Registro de Fincas</h1>
 
-    <!-- Mensajes -->
-    <div th:if="${exito}" class="alert alert-success" th:text="${exito}"></div>
-    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
-
     <!-- FORMULARIO -->
-    <form th:action="@{/fincas/guardar}" th:object="${finca}" method="post" class="card card-body mb-4">
+    <form th:action="${finca.id == null} ? @{/fincas/guardar} : @{/fincas/actualizar}"
+          th:object="${finca}"
+          method="post"
+          class="card card-body mb-4">
+
+        <input type="hidden" th:field="*{id}"/>
 
         <div class="row mb-3">
+
             <div class="col-md-6">
-                <label for="nombrePropietario" class="form-label">Nombre del propietario</label>
-                <input type="text" id="nombrePropietario" class="form-control"
-                       th:field="*{nombrePropietario}" required>
+                <label class="form-label">Nombre del Propietario</label>
+                <input type="text" th:field="*{nombrePropietario}" class="form-control" required>
             </div>
 
             <div class="col-md-6">
-                <label for="telefono" class="form-label">Teléfono</label>
-                <input type="text" id="telefono" class="form-control"
-                       th:field="*{telefono}" required>
+                <label class="form-label">Teléfono</label>
+                <input type="text" th:field="*{telefono}" class="form-control" required>
             </div>
+
         </div>
 
         <div class="row mb-3">
 
             <!-- DEPARTAMENTO -->
             <div class="col-md-6">
-                <label for="departamento" class="form-label">Departamento</label>
-                <select id="departamento" name="departamentoId" class="form-select" required>
+                <label class="form-label">Departamento</label>
+                <select id="departamento"
+                        name="departamentoId"
+                        class="form-select"
+                        required>
                     <option value="">-- Seleccione --</option>
+
                     <option th:each="dpto : ${departamentos}"
                             th:value="${dpto.id}"
-                            th:text="${dpto.nombre}">
+                            th:text="${dpto.nombre}"
+                            th:selected="${finca.departamento != null and dpto.id == finca.departamento.id}">
                     </option>
+
                 </select>
             </div>
 
             <!-- MUNICIPIO -->
             <div class="col-md-6">
-                <label for="municipio" class="form-label">Municipio</label>
-                <select id="municipio" name="municipioId" class="form-select" required>
-                    <option value="">-- Seleccione un departamento primero --</option>
+                <label class="form-label">Municipio</label>
+
+                <select id="municipio"
+                        name="municipioId"
+                        class="form-select"
+                        required>
+
+                    <option th:if="${finca.municipio == null}" value="">
+                        -- Seleccione un departamento primero --
+                    </option>
+
+                    <option th:each="m : ${finca.departamento != null ? finca.departamento.municipios : {}}"
+                            th:value="${m.id}"
+                            th:text="${m.nombre}"
+                            th:selected="${finca.municipio != null and m.id == finca.municipio.id}">
+                    </option>
+
                 </select>
+
             </div>
+
         </div>
 
-        <!-- DIRECCIÓN -->
         <div class="mb-3">
-            <label for="direccion" class="form-label">Dirección</label>
-            <input type="text" id="direccion" class="form-control"
-                   th:field="*{direccion}" required>
+            <label class="form-label">Dirección</label>
+            <input type="text" th:field="*{direccion}" class="form-control" required>
         </div>
 
-        <button type="submit" class="btn btn-primary">Guardar Finca</button>
+        <button type="submit" class="btn btn-primary">
+            <span th:text="${finca.id == null ? 'Guardar Finca' : 'Actualizar Finca'}"></span>
+        </button>
+
     </form>
 
-    <!-- LISTA DE FINCAS -->
+    <!-- LISTA -->
     <h2 class="mb-3">Fincas registradas</h2>
+
     <table class="table table-striped">
         <thead>
         <tr>
@@ -79,7 +106,9 @@
             <th>Acciones</th>
         </tr>
         </thead>
+
         <tbody>
+
         <tr th:each="f : ${fincas}">
             <td th:text="${f.id}"></td>
             <td th:text="${f.nombrePropietario}"></td>
@@ -89,6 +118,9 @@
             <td th:text="${f.direccion}"></td>
 
             <td>
+                <a th:href="@{'/fincas/editar/' + ${f.id}}"
+                   class="btn btn-warning btn-sm">Editar</a>
+
                 <a th:href="@{'/fincas/eliminar/' + ${f.id}}"
                    class="btn btn-danger btn-sm"
                    onclick="return confirm('¿Seguro que deseas eliminar esta finca?')">
@@ -100,23 +132,29 @@
         <tr th:if="${#lists.isEmpty(fincas)}">
             <td colspan="7" class="text-center">No hay fincas registradas</td>
         </tr>
+
         </tbody>
+
     </table>
+
 </div>
+
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
+
         const dptoSelect = document.getElementById('departamento');
         const muniSelect = document.getElementById('municipio');
 
-        // Cuando cambia el departamento
         dptoSelect.addEventListener('change', () => {
+
             const dptoId = dptoSelect.value;
 
             muniSelect.innerHTML = '<option value="">Cargando...</option>';
 
             if (!dptoId) {
-                muniSelect.innerHTML = '<option value="">-- Seleccione un departamento primero --</option>';
+                muniSelect.innerHTML =
+                    '<option value="">-- Seleccione un departamento primero --</option>';
                 return;
             }
 
@@ -132,10 +170,12 @@
                     });
                 })
                 .catch(err => {
-                    console.error(err);
-                    muniSelect.innerHTML = '<option value="">Error cargando municipios</option>';
+                    muniSelect.innerHTML =
+                        '<option value="">Error cargando municipios</option>';
                 });
+
         });
+
     });
 </script>
 
