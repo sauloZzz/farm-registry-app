@@ -66,7 +66,7 @@ src/
 
 ### 1️⃣ Clone the repository
 ```bash
-git clone https://github.com/your-username/fincasdpts.git
+git clone https://github.com/sauloZzz/fincasdpts.git
 cd fincasdpts
 
 
@@ -90,3 +90,23 @@ mvn spring-boot:run
 Then open in your browser:
 
 http://localhost:8080/fincas
+
+🧪 Future Improvements
+
+Add pagination and search filters
+
+Implement user authentication
+
+Add Excel/PDF export for reports
+
+Improve responsive UI design
+
+🧑‍💻 Author
+
+Saul Perez
+Student – Universisty of Cordoba
+GitHub: https://github.com/sauloZzz
+
+📄 License
+
+This project is released under the MIT License.
