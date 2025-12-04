@@ -48,16 +48,22 @@ The application is built using **Spring Boot, Thymeleaf, JPA/Hibernate, and MySQ
 ## 📦 Project Structure
 
 src/
-├── main/java/edu/unisangil/fincasdpts/
-│ ├── controller/ # Controllers for handling HTTP requests
-│ ├── entity/ # JPA entities (Finca, Municipio, Departamento)
-│ ├── repository/ # Spring Data repositories
-│ ├── service/ # Optional service layer
-│ └── FinacsDptsApp # Main Spring Boot class
-└── main/resources/
-├── templates/ # Thymeleaf HTML files
-├── static/ # CSS / JS / images
-└── application.properties
+├── main/
+│   ├── java/
+│   │   └── edu/
+│   │       └── unisangil/
+│   │           └── fincasdpts/
+│   │               ├── controller/        # Controllers for handling HTTP requests
+│   │               ├── entity/            # JPA entities (Finca, Municipio, Departamento)
+│   │               ├── repository/        # Spring Data repositories
+│   │               ├── service/           # Optional service layer
+│   │               └── FincasDptsApp.java # Main Spring Boot application class
+│   └── resources/
+│       ├── templates/                     # Thymeleaf HTML files
+│       ├── static/                        # CSS / JS / images
+│       └── application.properties          # Spring Boot configuration
+└── test/                                   # Unit and integration tests (optional)
+
 
 
 ---
