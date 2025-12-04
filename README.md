@@ -61,10 +61,8 @@ src/
 │   └── resources/
 │       ├── templates/                     # Thymeleaf HTML files
 │       ├── static/                        # CSS / JS / images
-│       └── application.properties          # Spring Boot configuration
-└── test/                                   # Unit and integration tests (optional)
-
-
+│       └── application.properties         # Spring Boot configuration
+└── test/                                  # Unit tests (optional)
 
 ---
 
