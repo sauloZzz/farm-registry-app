@@ -12,6 +12,7 @@ COPY pom.xml .
 COPY src /app/src
 
 # Ejecuta la compilacion de Maven. Esto genera el JAR en /app/target/
+ENV MAVEN_OPTS="-Xmx300m"
 RUN mvn clean package -DskipTests
 
 # ==========================================================
