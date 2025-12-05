@@ -1,8 +1,8 @@
 # ==========================================================
 # STAGE 1: BUILDER (Compila el codigo Java y genera el JAR)
-# CORRECCIÓN 1: Imagen de Maven válida (usando Temurin JDK)
+# Usamos una imagen oficial que incluye Maven 3.9 y Java 17 JDK
 # ==========================================================
-FROM eclipse-temurin:17-jdk-alpine AS builder
+FROM maven:3.9-eclipse-temurin-17 AS builder
 
 # Establece el directorio de trabajo dentro del contenedor
 WORKDIR /app
@@ -15,8 +15,8 @@ COPY src /app/src
 RUN mvn clean package -DskipTests
 
 # ==========================================================
-# STAGE 2: RUNNER (Crea la imagen final, mas pequena)
-# CORRECCIÓN 2: Imagen JRE válida (usando Temurin JRE)
+# STAGE 2: RUNNER (Crea la imagen final, mas pequena y segura)
+# Usamos la version mas ligera de Java 17 JRE (solo para ejecutar)
 # ==========================================================
 FROM eclipse-temurin:17-jre-alpine
 
@@ -26,8 +26,9 @@ WORKDIR /app
 # Copia el archivo JAR SOLAMENTE desde la etapa 'builder' a la imagen final
 COPY --from=builder /app/target/*.jar app.jar
 
-# Expone el puerto 8080
+# Expone el puerto 8080 (puerto por defecto de Spring Boot)
 EXPOSE 8080
 
 # Define el punto de entrada para ejecutar el JAR con el perfil 'render' activo
+# Esto usa las variables de entorno de la BD configuradas en Render.
 ENTRYPOINT ["java", "-jar", "-Dspring.profiles.active=render", "/app.jar"]
