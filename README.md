@@ -1,116 +1,137 @@
-# 🏡 FincasDpts – Agricultural Property Management System
+<div align="center">
 
-FincasDpts is a web-based management system designed for registering, editing, searching, and organizing agricultural properties (fincas) across different departments and municipalities.  
-The application is built using **Spring Boot, Thymeleaf, JPA/Hibernate, and MySQL** following a clean MVC architecture.
+# 🏡 FincasDpts
+### Sistema de Gestión de Propiedades Agropecuarias
 
----
+[![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://www.oracle.com/java/)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.0-brightgreen.svg)](https://spring.io/projects/spring-boot)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue.svg)](https://www.postgresql.org/)
+[![Docker](https://img.shields.io/badge/Docker-Enabled-blue.svg)](https://www.docker.com/)
+[![Render](https://img.shields.io/badge/Render-Deployed-purple.svg)](https://render.com/)
 
-## 🚀 Features
+<p align="center">
+  <a href="#-sobre-el-proyecto">Sobre el Proyecto</a> •
+  <a href="#-funcionalidades">Funcionalidades</a> •
+  <a href="#-tecnologías">Tecnologías</a> •
+  <a href="#-desafíos-y-soluciones-en-el-despliegue">Desafíos de Despliegue</a> •
+  <a href="#-instalación-y-ejecución">Instalación</a>
+</p>
 
-### ✅ Property (Finca) Management
-- Create new properties  
-- Edit existing properties  
-- Delete properties  
-- View detailed information  
-- Validate data before saving  
-
-### 🌎 Geographic Structure
-- Each property is associated with:
-  - A **Department**
-  - A **Municipality** (filtered by department)
-
-### 💾 Database Integration
-- Fully connected to **MySQL**
-- Uses **JPA relationships**:
-  - `Departamento` → `Municipio` (One-to-Many)
-  - `Municipio` → `Finca` (One-to-Many)
-- Automatic schema handling with Hibernate
-
-### 🎨 Modern UI
-- Thymeleaf templates
-- Bootstrap styles (optional)
-- Clean interface for CRUD operations
+</div>
 
 ---
 
-## 🧱 Technologies Used
+## 📖 Sobre el Proyecto
 
-| Layer | Technology |
+**FincasDpts** es un sistema web robusto diseñado para la gestión administrativa de propiedades agrícolas (fincas). La aplicación permite organizar, registrar y editar información sobre fincas, vinculándolas geográficamente a Departamentos y Municipios mediante una base de datos relacional.
+
+El proyecto sigue una arquitectura **MVC (Modelo-Vista-Controlador)** limpia, utiliza contenedores **Docker** para el entorno de desarrollo y está desplegado en la nube a través de **Render**.
+
+### 🔗 Demo en Vivo
+> **Visita el proyecto desplegado aquí:**
+> 🚀 **[https://farm-registry-app.onrender.com](https://farm-registry-app.onrender.com)**
+> *(Nota: Al estar en el plan gratuito de Render, el servicio puede tardar unos 50 segundos en "despertar" si ha estado inactivo. Por favor, ten paciencia en la primera carga).*
+
+---
+
+## 🚀 Funcionalidades
+
+### ✅ Gestión de Fincas (CRUD)
+* **Registro Completo:** Creación de nuevas propiedades con datos del propietario, contacto y dirección.
+* **Edición Dinámica:** Actualización de registros existentes.
+* **Persistencia de Datos:** Uso de JPA/Hibernate para transacciones seguras con la base de datos.
+
+### 🌎 Inteligencia Geográfica
+* **Estructura Jerárquica:** Modelo relacional estricto:
+    * `Departamento` (1) ➡ (N) `Municipio`
+    * `Municipio` (1) ➡ (N) `Finca`
+* **Listas en Cascada:** Al seleccionar un departamento, los municipios se filtran automáticamente.
+
+### 🛠 Aspectos Técnicos Destacados
+* **Dockerización:** Entorno configurado con `Dockerfile` y `docker-compose` para replicar la base de datos localmente.
+* **Carga Automática de Datos:** Script SQL (`data.sql`) que puebla la base de datos con departamentos y municipios iniciales.
+* **Configuración Híbrida:** El sistema detecta automáticamente si está corriendo en `localhost` o en la nube (Render).
+
+---
+
+## ☁️ Desafíos y Soluciones en el Despliegue
+
+Llevar esta aplicación a producción en **Render** presentó varios retos técnicos interesantes que fueron resueltos mediante configuración avanzada:
+
+### 1. 🔐 Conexión a Base de Datos y SSL
+* **El Desafío:** La aplicación fallaba al conectar con PostgreSQL en la nube, arrojando errores de `EOFException` y `Connection Refused` durante el *handshake*.
+* **La Solución:** Se identificó que la infraestructura de Render exige conexiones encriptadas. Se configuró la URL JDBC inyectando el parámetro `?sslmode=require` y se utilizaron las credenciales internas de la red privada de Render.
+
+### 2. 📉 Restricciones de Memoria (OOM Errors)
+* **El Desafío:** El proceso de construcción (*Build*) fallaba consistentemente con `Exit Status 1` al descargar dependencias de Maven, debido a que la JVM excedía el límite de 512MB de RAM del plan gratuito.
+* **La Solución:** Se optimizó el **Dockerfile** limitando el Heap Size de Maven. Se inyectó la variable de entorno `MAVEN_OPTS="-Xmx300m"` en el comando de construcción, asegurando que el proceso se mantuviera dentro de los límites del contenedor.
+
+### 3. 🔄 Configuración de Entorno (Local vs. Nube)
+* **El Desafío:** Tener credenciales "quemadas" (hardcoded) en `application.properties` hacía inseguro y difícil el cambio entre Docker local y la nube.
+* **La Solución:** Implementación de **Inyección de Propiedades**. Se utilizó la sintaxis `${VARIABLE_ENTORNO:valor_por_defecto}` en Spring Boot, permitiendo que la app use variables seguras en la nube y valores por defecto (`localhost`) en desarrollo.
+
+### 4. 🗃️ Persistencia y Carga de Datos (Seeding)
+* **El Desafío:** Aunque la app desplegaba, las listas desplegables aparecían vacías. Hibernate ignoraba el script de carga inicial porque detectaba tablas ya existentes (pero vacías).
+* **La Solución:**
+    1. Estandarización del script a `data.sql` (nativo de Spring Boot).
+    2. Configuración estratégica de `SPRING_JPA_HIBERNATE_DDL_AUTO=create-drop` en el primer despliegue exitoso para forzar una limpieza de esquema y reinserción de datos limpios.
+
+---
+
+## 💻 Stack Tecnológico
+
+| Capa | Tecnología |
 |-------|------------|
-| Backend | Spring Boot 3, Java 17 |
-| Frontend | Thymeleaf, HTML5, Bootstrap |
-| Database | MySQL 8, JPA/Hibernate |
-| Build tool | Maven |
-| Version control | Git & GitHub |
+| **Backend** | Java 21, Spring Boot 3 (Web, Data JPA) |
+| **Frontend** | Thymeleaf, HTML5, Bootstrap 5 |
+| **Base de Datos** | PostgreSQL (Producción y Docker Local) |
+| **DevOps** | Docker, Docker Compose, Maven |
+| **Infraestructura** | Render (PaaS) |
 
 ---
 
-## 📦 Project Structure
+## ⚡ Instalación y Ejecución
 
-src/
-├── main/
-│   ├── java/
-│   │   └── edu/
-│   │       └── unisangil/
-│   │           └── fincasdpts/
-│   │               ├── controller/        # Controllers for handling HTTP requests
-│   │               ├── entity/            # JPA entities (Finca, Municipio, Departamento)
-│   │               ├── repository/        # Spring Data repositories
-│   │               ├── service/           # Optional service layer
-│   │               └── FincasDptsApp.java # Main Spring Boot application class
-│   └── resources/
-│       ├── templates/                     # Thymeleaf HTML files
-│       ├── static/                        # CSS / JS / images
-│       └── application.properties         # Spring Boot configuration
-└── test/                                  # Unit tests (optional)
+Puedes correr este proyecto en tu máquina local usando **Docker** (recomendado) o Java directamente.
 
----
+### Prerrequisitos
+* Java JDK 17 o 21
+* Maven 3.8+
+* Docker Desktop (Opcional)
 
-## ⚙️ Installation & Setup
+### Opción 1: Ejecución con Docker (Recomendada)
+Este método levanta la base de datos PostgreSQL automáticamente.
 
-### 1️⃣ Clone the repository
 ```bash
-git clone https://github.com/sauloZzz/fincasdpts.git
-cd fincasdpts
+# 1. Clonar el repositorio
+git clone [https://github.com/sauloZzz/farm-registry-app.git](https://github.com/sauloZzz/farm-registry-app.git)
+cd farm-registry-app
+
+# 2. Levantar la base de datos
+docker-compose up -d
+
+# 3. Ejecutar la aplicación (Usando el Wrapper de Maven)
+# En Windows (CMD):
+mvnw spring-boot:run
+# En Mac/Linux/PowerShell:
+./mvnw spring-boot:run
+
+📂 Estructura del Proyecto
+Plaintext
+
+src/main/
+├── java/edu/unisangil/fincasdpts/
+│   ├── controller/      # Controladores Web (HTTP Requests)
+│   ├── entity/          # Modelos de Datos (JPA Entities)
+│   ├── repository/      # Interfaces de Base de Datos (Repositories)
+│   └── FincasDptsApplication.java
+└── resources/
+    ├── templates/       # Vistas HTML (Thymeleaf)
+    ├── static/          # Archivos CSS y JS
+    ├── application.properties # Configuración dinámica
+    └── data.sql         # Datos semilla (Departamentos/Municipios)
+🧑‍💻 Autor
+Saul Perez Estudiante – Universidad de Córdoba
 
 
-2️⃣ Configure the database
 
-Create a MySQL database:
-CREATE DATABASE fincas_dpts CHARACTER SET utf8mb4;
-
-Update application.properties:
-spring.datasource.url=jdbc:mysql://localhost:3306/fincas_dpts
-spring.datasource.username=your_user
-spring.datasource.password=your_password
-
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
-
-3️⃣ Run the application
-mvn spring-boot:run
-
-
-Then open in your browser:
-
-http://localhost:8080/fincas
-
-🧪 Future Improvements
-
-Add pagination and search filters
-
-Implement user authentication
-
-Add Excel/PDF export for reports
-
-Improve responsive UI design
-
-🧑‍💻 Author
-
-Saul Perez
-Student – Universisty of Cordoba
-GitHub: https://github.com/sauloZzz
-
-📄 License
-
-This project is released under the MIT License.
