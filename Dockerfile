@@ -30,4 +30,5 @@ COPY --from=builder /app/target/*.jar app.jar
 EXPOSE 8080
 
 # Define el punto de entrada para ejecutar el JAR con el perfil 'render' activo
-ENTRYPOINT ["java", "-jar", "-Dspring.profiles.active=render", "/app.jar"]
+# CORRECCIÓN FINAL: Cambiado "/app.jar" a "app.jar" para que coincida con el WORKDIR
+ENTRYPOINT ["java", "-jar", "-Dspring.profiles.active=render", "app.jar"]
