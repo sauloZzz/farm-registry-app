@@ -32,6 +32,10 @@ public class FincaController {
     public String mostrarFincas(Model model) {
         model.addAttribute("fincas", fincaRepository.findAll());
         model.addAttribute("departamentos", departamentoRepository.findAll());
+
+        // CORRECCIÓN CLAVE: Agregamos los municipios para evitar el error 500 en Thymeleaf
+        model.addAttribute("municipios", municipioRepository.findAll());
+
         model.addAttribute("finca", new Finca());
         return "fincas";
     }
@@ -71,6 +75,8 @@ public class FincaController {
         model.addAttribute("departamentos", departamentos);
         model.addAttribute("fincas", fincas);
 
+        // CLAVE: También necesario al editar para poblar los desplegables
+        model.addAttribute("municipios", municipioRepository.findAll());
 
         return "fincas";
     }
@@ -105,7 +111,7 @@ public class FincaController {
         return "redirect:/fincas";
     }
 
-    // MUNICIPIOS POR DEPARTAMENTO
+    // MUNICIPIOS POR DEPARTAMENTO (Endpoint API)
     @GetMapping("/municipios/{idDepartamento}")
     @ResponseBody
     public List<Municipio> obtenerMunicipiosPorDepartamento(@PathVariable Long idDepartamento) {

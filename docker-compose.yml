@@ -1,0 +1,35 @@
+version: '3.8'
+services:
+  # 1. SERVICIO DE LA BASE DE DATOS (db)
+  db:
+    # **CAMBIO CLAVE**: REVERTIMOS a la imagen estándar.
+    image: postgres:15-alpine
+    container_name: fincasdptls-db
+    restart: always
+    environment:
+      POSTGRES_DB: fincasdptls
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: Admin123
+    volumes:
+      # Dejamos SOLO el volumen de persistencia de datos (db-data).
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  # 2. SERVICIO DE LA APLICACIÓN SPRING BOOT (app)
+  app:
+    # Usaremos una imagen creada desde el Dockerfile estándar
+    build: .
+    container_name: fincasdptls-app
+    # Aseguramos que la DB esté lista antes de que la app intente conectarse
+    depends_on:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/fincasdptls
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: Admin123
+    ports:
+      - "8080:8080"
+
+volumes:
+  db-data:

@@ -1,0 +1,7 @@
+# Base: Usamos la misma imagen de PostgreSQL 15
+FROM postgres:15-alpine
+
+# Copiamos el script de inicialización desde tu carpeta local
+# al directorio de inicialización del contenedor.
+# ¡Asegúrate que tu archivo se llama init.sql!
+COPY src/main/resources/init.sql /docker-entrypoint-initdb.d/init.sql

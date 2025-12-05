@@ -1,22 +1,53 @@
-package edu.unisangil.fincasdpts.entity;
+package edu.unisangil.fincasdpts.entity; // Asegúrate de que este es tu paquete real
 
+import com.fasterxml.jackson.annotation.JsonBackReference; // <-- Importación CLAVE
 import jakarta.persistence.*;
-import lombok.Data;
 
 @Entity
 @Table(name = "municipio")
-@Data
 public class Municipio {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id") // ← coincide con la tabla municipio(id)
     private Long id;
 
-    @Column(name = "nombre", nullable = false, length = 150)
+    @Column(nullable = false)
     private String nombre;
 
-    @ManyToOne
-    @JoinColumn(name = "departamento_id", nullable = false) // FK municipio.departamento_id → departamento.id
+    // Relación Many-to-One
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "departamento_id")
+    // LADO CLAVE: @JsonBackReference indica a Jackson que IGNORE esta referencia
+    // durante la serialización para evitar el bucle.
+    @JsonBackReference
     private Departamento departamento;
+
+    // Constructor vacío requerido por JPA
+    public Municipio() {
+    }
+
+    // Getters y Setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public Departamento getDepartamento() {
+        return departamento;
+    }
+
+    public void setDepartamento(Departamento departamento) {
+        this.departamento = departamento;
+    }
 }

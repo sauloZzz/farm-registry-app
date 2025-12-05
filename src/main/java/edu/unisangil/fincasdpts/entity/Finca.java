@@ -1,32 +1,78 @@
 package edu.unisangil.fincasdpts.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
 
 @Entity
 @Table(name = "finca")
-@Data
 public class Finca {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id") // ← coincide con la tabla finca(id)
     private Long id;
 
-    @Column(name = "nombre_propietario", nullable = false, length = 150)
+    // Campos solicitados por el HTML
     private String nombrePropietario;
+    private String telefono;
+    private String direccion;
 
     @ManyToOne
-    @JoinColumn(name = "departamento_id", nullable = false) // FK finca.departamento_id → departamento.id
+    @JoinColumn(name = "departamento_id")
     private Departamento departamento;
 
     @ManyToOne
-    @JoinColumn(name = "municipio_id", nullable = false) // FK finca.municipio_id → municipio.id
+    @JoinColumn(name = "municipio_id")
     private Municipio municipio;
 
-    @Column(name = "direccion", nullable = false, length = 255)
-    private String direccion;
+    // CONSTRUCTOR VACÍO
+    public Finca() {
+    }
 
-    @Column(name = "telefono", nullable = false, length = 30)
-    private String telefono;
+    // GETTERS Y SETTERS MANUALES
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getNombrePropietario() {
+        return nombrePropietario;
+    }
+
+    public void setNombrePropietario(String nombrePropietario) {
+        this.nombrePropietario = nombrePropietario;
+    }
+
+    public String getTelefono() {
+        return telefono;
+    }
+
+    public void setTelefono(String telefono) {
+        this.telefono = telefono;
+    }
+
+    public String getDireccion() {
+        return direccion;
+    }
+
+    public void setDireccion(String direccion) {
+        this.direccion = direccion;
+    }
+
+    public Departamento getDepartamento() {
+        return departamento;
+    }
+
+    public void setDepartamento(Departamento departamento) {
+        this.departamento = departamento;
+    }
+
+    public Municipio getMunicipio() {
+        return municipio;
+    }
+
+    public void setMunicipio(Municipio municipio) {
+        this.municipio = municipio;
+    }
 }
