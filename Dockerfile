@@ -1,8 +1,8 @@
 # ==========================================================
 # STAGE 1: BUILDER (Compila el codigo Java y genera el JAR)
-# USAMOS LA ETIQUETA CORREGIDA: maven:3.9-jdk-17
+# CORRECCIÓN 1: Imagen de Maven válida (usando Temurin JDK)
 # ==========================================================
-FROM maven:3.9-jdk-17 AS builder
+FROM eclipse-temurin:17-jdk-alpine AS builder
 
 # Establece el directorio de trabajo dentro del contenedor
 WORKDIR /app
@@ -16,6 +16,7 @@ RUN mvn clean package -DskipTests
 
 # ==========================================================
 # STAGE 2: RUNNER (Crea la imagen final, mas pequena)
+# CORRECCIÓN 2: Imagen JRE válida (usando Temurin JRE)
 # ==========================================================
 FROM eclipse-temurin:17-jre-alpine
 
