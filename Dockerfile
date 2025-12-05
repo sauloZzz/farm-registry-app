@@ -1,8 +1,8 @@
 # ==========================================================
 # STAGE 1: BUILDER (Compila el codigo Java y genera el JAR)
-# Usamos una imagen oficial que incluye Maven 3.9 y Java 17 JDK
+# CORRECCIÓN: Usamos Maven con Java 21 para que coincida con tu pom.xml
 # ==========================================================
-FROM maven:3.9-eclipse-temurin-17 AS builder
+FROM maven:3.9-eclipse-temurin-21 AS builder
 
 # Establece el directorio de trabajo dentro del contenedor
 WORKDIR /app
@@ -16,9 +16,9 @@ RUN mvn clean package -DskipTests
 
 # ==========================================================
 # STAGE 2: RUNNER (Crea la imagen final, mas pequena y segura)
-# Usamos la version mas ligera de Java 17 JRE (solo para ejecutar)
+# CORRECCIÓN: Usamos Java 21 JRE para ejecutar el JAR compilado en Java 21
 # ==========================================================
-FROM eclipse-temurin:17-jre-alpine
+FROM eclipse-temurin:21-jre-alpine
 
 # Establece el directorio de trabajo
 WORKDIR /app
@@ -30,5 +30,4 @@ COPY --from=builder /app/target/*.jar app.jar
 EXPOSE 8080
 
 # Define el punto de entrada para ejecutar el JAR con el perfil 'render' activo
-# Esto usa las variables de entorno de la BD configuradas en Render.
 ENTRYPOINT ["java", "-jar", "-Dspring.profiles.active=render", "/app.jar"]
