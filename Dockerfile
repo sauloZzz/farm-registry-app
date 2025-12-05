@@ -17,7 +17,7 @@ RUN mvn clean package -DskipTests
 # ==========================================================
 # STAGE 2: RUNNER (Crea la imagen final, mas pequena)
 # ==========================================================
-FROM openjdk:17-jre-slim
+FROM eclipse-temurin:17-jre-alpine
 
 # Establece el directorio de trabajo
 WORKDIR /app
